@@ -1,9 +1,10 @@
 import SearchForm from "@/components/SearchForm";
+import CrawlForm from "@/components/CrawlForm";
 
 export default function Home() {
   return (
-    <main className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-4xl mx-auto">
+    <main className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-6xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
             채용공고를
@@ -14,12 +15,37 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="relative">
-          <SearchForm />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          {/* 크롤링 폼 */}
+          <div className="relative">
+            <div className="mb-4 text-center">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                1단계: 데이터 수집
+              </h3>
+              <p className="text-sm text-gray-600">
+                채용사이트에서 최신 채용공고를 크롤링하여 데이터베이스에
+                저장합니다
+              </p>
+            </div>
+            <CrawlForm />
+            {/* Decorative elements */}
+            <div className="absolute -top-4 -left-4 w-24 h-24 bg-green-200 rounded-full opacity-20 animate-pulse"></div>
+          </div>
 
-          {/* Decorative elements for visual enhancement */}
-          <div className="absolute -top-4 -left-4 w-24 h-24 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
-          <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-indigo-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
+          {/* 검색 폼 */}
+          <div className="relative">
+            <div className="mb-4 text-center">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                2단계: 채용공고 검색
+              </h3>
+              <p className="text-sm text-gray-600">
+                저장된 채용공고 데이터베이스에서 원하는 조건으로 검색합니다
+              </p>
+            </div>
+            <SearchForm />
+            {/* Decorative elements */}
+            <div className="absolute -top-4 -right-4 w-32 h-32 bg-blue-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
+          </div>
         </div>
 
         {/* Call to action section */}
