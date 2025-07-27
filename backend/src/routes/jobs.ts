@@ -1,8 +1,123 @@
 import { Router } from "express";
-import { searchJobs, crawlJobsBySource } from "../crawlers";
+import { searchJobs, crawlJobsBySource, crawlAllJobs } from "../crawlers";
 import { BaseJob, toBaseJob } from "../types/job";
+import {
+  saveJobsToDatabase,
+  searchJobsFromDatabase,
+  clearJobsDatabase,
+  getJobsStats,
+  JobSearchParams,
+} from "../services/jobService";
 
 const router = Router();
+
+// 크롤링 실행 및 데이터베이스 저장 API
+router.post("/crawl", async (req, res) => {
+  try {
+    console.log("@@@ API Request to /api/jobs/crawl @@@");
+    console.log("@@@ Request body: @@@", req.body);
+
+    const { keyword, limit = 100 } = req.body;
+
+    if (!keyword || keyword.trim() === "") {
+      return res.status(400).json({
+        error: "키워드가 필요합니다.",
+        message: "크롤링할 키워드를 입력해주세요.",
+      });
+    }
+
+    console.log(`Starting crawl for keyword: ${keyword} with limit: ${limit}`);
+
+    // 크롤링 실행
+    const crawledJobs = await crawlAllJobs(keyword, limit);
+
+    if (crawledJobs.length === 0) {
+      return res.json({
+        message: "크롤링 결과가 없습니다.",
+        crawledCount: 0,
+        savedCount: 0,
+        keyword,
+      });
+    }
+
+    // 데이터베이스에 저장
+    await saveJobsToDatabase(crawledJobs);
+
+    console.log(`Successfully crawled and saved ${crawledJobs.length} jobs`);
+
+    res.json({
+      message: "크롤링이 완료되었습니다.",
+      crawledCount: crawledJobs.length,
+      savedCount: crawledJobs.length,
+      keyword,
+      jobs: crawledJobs.slice(0, 5), // 처음 5개만 미리보기로 반환
+    });
+  } catch (error) {
+    console.error("Error in /api/jobs/crawl:", error);
+    res.status(500).json({
+      error: "크롤링 중 오류가 발생했습니다.",
+      message: error instanceof Error ? error.message : "알 수 없는 오류",
+    });
+  }
+});
+
+// 데이터베이스에서 채용 정보 검색 API
+router.get("/search", async (req, res) => {
+  try {
+    console.log("@@@ API Request to /api/jobs/search @@@");
+    console.log("@@@ Query parameters: @@@", req.query);
+
+    const {
+      keyword,
+      category,
+      location,
+      page = "1",
+      limit = "10",
+      sortBy = "latest",
+    } = req.query;
+
+    const searchParams: JobSearchParams = {
+      keyword: keyword as string,
+      category: category as string,
+      location: location as string,
+      page: parseInt(page as string) || 1,
+      limit: parseInt(limit as string) || 10,
+      sortBy: sortBy as string,
+    };
+
+    console.log(`Searching database with params:`, searchParams);
+
+    // 데이터베이스에서 검색
+    const result = await searchJobsFromDatabase(searchParams);
+
+    console.log(`Found ${result.totalCount} jobs in database`);
+
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /api/jobs/search:", error);
+    res.status(500).json({
+      error: "데이터베이스 검색 중 오류가 발생했습니다.",
+      message: error instanceof Error ? error.message : "알 수 없는 오류",
+    });
+  }
+});
+
+// 데이터베이스 통계 조회 API
+router.get("/stats", async (req, res) => {
+  try {
+    console.log("@@@ API Request to /api/jobs/stats @@@");
+
+    const stats = await getJobsStats();
+
+    res.json(stats);
+  } catch (error) {
+    console.error("Error in /api/jobs/stats:", error);
+    res.status(500).json({
+      error: "통계 조회 중 오류가 발생했습니다.",
+      message: error instanceof Error ? error.message : "알 수 없는 오류",
+    });
+  }
+});
 
 // 공통 필드만 반환하는 API (클라이언트용) - 먼저 정의
 router.get("/common", async (req, res) => {

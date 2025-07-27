@@ -9,8 +9,10 @@ import { Job, BaseJob, toBaseJob } from "../types/job";
  */
 export async function crawlAllJobs(
   keyword: string,
-  limit: number = 20
+  limit: number = 100
 ): Promise<Job[]> {
+  const startTime = Date.now();
+
   try {
     // keyword가 없으면 빈 배열 반환
     if (!keyword || keyword.trim() === "") {
@@ -19,12 +21,19 @@ export async function crawlAllJobs(
     }
 
     const halfLimit = Math.ceil(limit / 2);
+    console.log(
+      `Starting crawl for keyword: "${keyword}" with limit: ${limit} (${halfLimit} per site)`
+    );
 
     // 병렬로 두 사이트에서 크롤링
     const [wantedJobs, jumpitJobs] = await Promise.all([
       crawlWantedJobs(keyword, halfLimit),
       crawlJumpitJobs(keyword, halfLimit),
     ]);
+
+    console.log(
+      `Crawling results - Wanted: ${wantedJobs.length}, Jumpit: ${jumpitJobs.length}`
+    );
 
     // 모든 결과를 합치기
     const allJobs: Job[] = [...wantedJobs, ...jumpitJobs];
@@ -36,9 +45,17 @@ export async function crawlAllJobs(
       );
     });
 
-    return allJobs.slice(0, limit);
+    const finalResults = allJobs.slice(0, limit);
+    const crawlingTime = Date.now() - startTime;
+
+    console.log(
+      `Crawling completed in ${crawlingTime}ms - Total collected: ${allJobs.length}, Final results: ${finalResults.length}`
+    );
+
+    return finalResults;
   } catch (error) {
-    console.error("Error crawling all jobs:", error);
+    const crawlingTime = Date.now() - startTime;
+    console.error(`Error crawling all jobs after ${crawlingTime}ms:`, error);
     return [];
   }
 }
@@ -78,7 +95,7 @@ export async function searchJobs(
   keyword?: string,
   category?: string,
   location?: string,
-  limit: number = 50
+  limit: number = 100
 ): Promise<Job[]> {
   try {
     // keyword가 없으면 빈 배열 반환
