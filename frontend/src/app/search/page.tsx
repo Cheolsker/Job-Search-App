@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState, Suspense, useMemo, useCallback } from "react";
+import { useEffect, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import SearchForm from "@/components/SearchForm";
-import SearchFilters, { FilterOptions } from "@/components/SearchFilters";
 import JobCard from "@/components/JobCard";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import SkeletonLoader from "@/components/SkeletonLoader";
@@ -36,7 +35,6 @@ function SearchPageContent() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<FilterOptions>({});
   const [totalResults, setTotalResults] = useState(0);
 
   // 페이지네이션 상태
@@ -44,21 +42,11 @@ function SearchPageContent() {
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // filters 객체를 메모이제이션하여 불필요한 리렌더링 방지
-  const memoizedFilters = useMemo(() => filters, [filters]);
-
   const fetchJobs = useCallback(async () => {
     setLoading(true);
 
     console.log("Fetching jobs with params:");
-    console.log(
-      keyword,
-      category,
-      location,
-      memoizedFilters,
-      currentPage,
-      pageSize
-    );
+    console.log(keyword, category, location, currentPage, pageSize);
 
     // 검색어가 없으면 빈 결과 표시
     if (!keyword || keyword.trim() === "") {
@@ -79,30 +67,6 @@ function SearchPageContent() {
       // 페이지네이션 파라미터 추가
       params.append("page", currentPage.toString());
       params.append("limit", pageSize.toString());
-
-      // 필터 옵션 추가
-      if (memoizedFilters.experience && memoizedFilters.experience.length > 0) {
-        params.append("experience", memoizedFilters.experience.join(","));
-      }
-
-      if (memoizedFilters.salary && memoizedFilters.salary.length > 0) {
-        params.append("salary", memoizedFilters.salary.join(","));
-      }
-
-      if (
-        memoizedFilters.companySize &&
-        memoizedFilters.companySize.length > 0
-      ) {
-        params.append("companySize", memoizedFilters.companySize.join(","));
-      }
-
-      if (memoizedFilters.workType && memoizedFilters.workType.length > 0) {
-        params.append("workType", memoizedFilters.workType.join(","));
-      }
-
-      if (memoizedFilters.sortBy) {
-        params.append("sortBy", memoizedFilters.sortBy);
-      }
 
       console.log("Fetching jobs with params:", params.toString());
 
@@ -280,17 +244,12 @@ function SearchPageContent() {
         setTotalResults(0);
       }
     }
-  }, [keyword, category, location, memoizedFilters, currentPage, pageSize]);
+  }, [keyword, category, location, currentPage, pageSize]);
 
   useEffect(() => {
     console.log("@@@ useEffect triggered @@@");
     fetchJobs();
   }, [fetchJobs]);
-
-  const handleFilterChange = (newFilters: FilterOptions) => {
-    setFilters(newFilters);
-    setCurrentPage(1); // 필터 변경 시 첫 페이지로 이동
-  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -310,108 +269,91 @@ function SearchPageContent() {
           <SearchForm isLoading={loading} />
         </div>
 
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* 필터 사이드바 */}
-          <div className="w-full md:w-64 flex-shrink-0">
-            <SearchFilters
-              onFilterChange={handleFilterChange}
-              initialFilters={filters}
-              isLoading={loading}
-            />
-          </div>
+        {/* 검색 결과 */}
+        <div className="w-full">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-800">
+                검색 결과 <span className="text-blue-600">{totalResults}</span>
+                건
+              </h2>
 
-          {/* 검색 결과 */}
-          <div className="flex-1">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  검색 결과{" "}
-                  <span className="text-blue-600">{totalResults}</span>건
-                </h2>
+              <div className="flex items-center space-x-4">
+                <PageSizeSelector
+                  pageSize={pageSize}
+                  onPageSizeChange={handlePageSizeChange}
+                  options={[10, 20, 50]}
+                  isLoading={loading}
+                />
 
-                <div className="flex items-center space-x-4">
-                  <PageSizeSelector
-                    pageSize={pageSize}
-                    onPageSizeChange={handlePageSizeChange}
-                    options={[10, 20, 50]}
-                    isLoading={loading}
-                  />
-
-                  <div className="text-sm text-gray-500">
-                    {keyword && <span>&ldquo;{keyword}&rdquo; </span>}
-                    {category && category !== "전체" && (
-                      <span>/ {category} </span>
-                    )}
-                    {location && location !== "전국" && (
-                      <span>/ {location}</span>
-                    )}
-                  </div>
+                <div className="text-sm text-gray-500">
+                  {keyword && <span>&ldquo;{keyword}&rdquo; </span>}
+                  {category && category !== "전체" && (
+                    <span>/ {category} </span>
+                  )}
+                  {location && location !== "전국" && <span>/ {location}</span>}
                 </div>
               </div>
             </div>
-
-            {/* 로딩 오버레이 */}
-            <LoadingOverlay isLoading={loading} message="검색 중입니다..." />
-
-            {loading ? (
-              <SkeletonLoader count={5} type="job-card" />
-            ) : error ? (
-              <div className="bg-red-50 text-red-600 p-4 rounded-lg">
-                {error}
-              </div>
-            ) : jobs.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-                {!keyword || keyword.trim() === "" ? (
-                  <>
-                    <p className="text-gray-600 text-lg">
-                      검색어를 입력해주세요.
-                    </p>
-                    <p className="text-gray-500 mt-2">
-                      원하는 직무, 회사, 키워드를 검색해보세요.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-gray-600 text-lg">
-                      검색 결과가 없습니다.
-                    </p>
-                    <p className="text-gray-500 mt-2">
-                      다른 키워드로 검색해보세요.
-                    </p>
-                  </>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {jobs.map((job) => (
-                  <JobCard
-                    key={job.id}
-                    title={job.title}
-                    company={job.company}
-                    location={job.location}
-                    category={job.category}
-                    postedDate={job.postedDate}
-                    salary={job.salary}
-                    experience={job.experience}
-                    source={job.source}
-                    sourceUrl={job.sourceUrl}
-                    imageUrl={job.imageUrl}
-                    contractType={job.contractType}
-                  />
-                ))}
-
-                {/* 페이지네이션 컴포넌트 */}
-                {totalPages > 1 && (
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                    isLoading={loading}
-                  />
-                )}
-              </div>
-            )}
           </div>
+
+          {/* 로딩 오버레이 */}
+          <LoadingOverlay isLoading={loading} message="검색 중입니다..." />
+
+          {loading ? (
+            <SkeletonLoader count={5} type="job-card" />
+          ) : error ? (
+            <div className="bg-red-50 text-red-600 p-4 rounded-lg">{error}</div>
+          ) : jobs.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+              {!keyword || keyword.trim() === "" ? (
+                <>
+                  <p className="text-gray-600 text-lg">
+                    검색어를 입력해주세요.
+                  </p>
+                  <p className="text-gray-500 mt-2">
+                    원하는 직무, 회사, 키워드를 검색해보세요.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-600 text-lg">검색 결과가 없습니다.</p>
+                  <p className="text-gray-500 mt-2">
+                    다른 키워드로 검색해보세요.
+                  </p>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {jobs.map((job) => (
+                <JobCard
+                  key={job.id}
+                  title={job.title}
+                  company={job.company}
+                  location={job.location}
+                  category={job.category}
+                  postedDate={job.postedDate}
+                  salary={job.salary}
+                  experience={job.experience}
+                  source={job.source}
+                  sourceUrl={job.sourceUrl}
+                  imageUrl={job.imageUrl}
+                  contractType={job.contractType}
+                />
+              ))}
+
+              {/* 페이지네이션 컴포넌트 */}
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  isLoading={loading}
+                />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </main>
