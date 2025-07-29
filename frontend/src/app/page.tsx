@@ -15,10 +15,11 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-12">
           {/* 크롤링 폼 */}
           <div className="relative">
-            <div className="mb-4 text-center">
+            {/* 데스크톱에서만 단계 설명 표시 */}
+            <div className="hidden lg:block mb-4 text-center">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 1단계: 데이터 수집
               </h3>
@@ -28,13 +29,14 @@ export default function Home() {
               </p>
             </div>
             <CrawlForm />
-            {/* Decorative elements */}
-            <div className="absolute -top-4 -left-4 w-24 h-24 bg-green-200 rounded-full opacity-20 animate-pulse"></div>
+            {/* Decorative elements - 데스크톱에서만 표시 */}
+            <div className="hidden lg:block absolute -top-4 -left-4 w-24 h-24 bg-green-200 rounded-full opacity-20 animate-pulse"></div>
           </div>
 
           {/* 검색 폼 */}
           <div className="relative">
-            <div className="mb-4 text-center">
+            {/* 데스크톱에서만 단계 설명 표시 */}
+            <div className="hidden lg:block mb-4 text-center">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 2단계: 채용공고 검색
               </h3>
@@ -43,8 +45,8 @@ export default function Home() {
               </p>
             </div>
             <SearchForm />
-            {/* Decorative elements */}
-            <div className="absolute -top-4 -right-4 w-32 h-32 bg-blue-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
+            {/* Decorative elements - 데스크톱에서만 표시 */}
+            <div className="hidden lg:block absolute -top-4 -right-4 w-32 h-32 bg-blue-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
           </div>
         </div>
 

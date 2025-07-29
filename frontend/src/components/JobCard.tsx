@@ -28,88 +28,128 @@ export default function JobCard({
   contractType,
 }: JobCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
-      <div className="flex">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 hover:shadow-md transition-all duration-200 active:scale-[0.98] sm:active:scale-100">
+      {/* 모바일: 세로 레이아웃, 데스크톱: 가로 레이아웃 */}
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+        {/* 회사 로고 */}
         {imageUrl && (
-          <div className="w-20 h-20 mr-4 flex-shrink-0">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto sm:mx-0 flex-shrink-0">
             <img
               src={imageUrl}
               alt={`${company} 로고`}
-              className="w-full h-full object-cover rounded"
+              className="w-full h-full object-cover rounded-lg"
             />
           </div>
         )}
-        <div className="flex-1">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900">
+
+        <div className="flex-1 min-w-0">
+          {/* 헤더 영역 */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4">
+            <div className="flex-1 min-w-0">
+              {/* 제목 */}
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 leading-tight">
                 {sourceUrl ? (
                   <a
                     href={sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-blue-600"
+                    className="hover:text-blue-600 transition-colors block overflow-hidden"
+                    style={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                    }}
                   >
                     {title}
                   </a>
                 ) : (
-                  title
+                  <span
+                    className="block overflow-hidden"
+                    style={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    {title}
+                  </span>
                 )}
               </h3>
-              <p className="text-gray-600">{company}</p>
 
-              <div className="flex flex-wrap gap-2 mt-3">
-                {location && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    {location}
-                  </span>
-                )}
-                {category && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    {category}
-                  </span>
-                )}
-                {experience && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                    {experience}
-                  </span>
-                )}
-                {contractType && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                    {contractType}
-                  </span>
-                )}
-              </div>
-
-              {salary && (
-                <p className="mt-2 text-sm text-gray-600">
-                  <span className="font-medium">연봉:</span> {salary}
-                </p>
-              )}
-
-              {source && (
-                <div className="mt-2 text-xs text-gray-500">
-                  출처: {source}
-                  {sourceUrl && (
-                    <a
-                      href={sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-2 text-blue-500 hover:underline"
-                    >
-                      원본 보기
-                    </a>
-                  )}
-                </div>
-              )}
+              {/* 회사명 */}
+              <p className="text-sm sm:text-base text-gray-600 mt-1 font-medium">
+                {company}
+              </p>
             </div>
 
-            <div className="text-right">
-              <span className="text-sm text-gray-500">
+            {/* 날짜 - 모바일에서는 상단 우측, 데스크톱에서는 우측 */}
+            <div className="flex-shrink-0 self-start">
+              <span className="text-xs sm:text-sm text-gray-500 bg-gray-50 px-2 py-1 rounded-md">
                 {formatDate(postedDate)}
               </span>
             </div>
           </div>
+
+          {/* 태그들 */}
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3">
+            {location && (
+              <span className="inline-flex items-center px-2 sm:px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                📍 {location}
+              </span>
+            )}
+            {category && (
+              <span className="inline-flex items-center px-2 sm:px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                💼 {category}
+              </span>
+            )}
+            {experience && (
+              <span className="inline-flex items-center px-2 sm:px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                ⏱️ {experience}
+              </span>
+            )}
+            {contractType && (
+              <span className="inline-flex items-center px-2 sm:px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                📋 {contractType}
+              </span>
+            )}
+          </div>
+
+          {/* 연봉 정보 */}
+          {salary && (
+            <div className="mt-3 p-2 bg-green-50 rounded-lg">
+              <p className="text-sm text-green-800 font-medium">💰 {salary}</p>
+            </div>
+          )}
+
+          {/* 출처 정보 */}
+          {source && (
+            <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+              <span>출처: {source}</span>
+              {sourceUrl && (
+                <a
+                  href={sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors font-medium"
+                >
+                  <svg
+                    className="w-3 h-3 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                  원본 보기
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
