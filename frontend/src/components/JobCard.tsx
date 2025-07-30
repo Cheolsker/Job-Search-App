@@ -29,11 +29,11 @@ export default function JobCard({
 }: JobCardProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 hover:shadow-md transition-all duration-200 active:scale-[0.98] sm:active:scale-100">
-      {/* 모바일: 세로 레이아웃, 데스크톱: 가로 레이아웃 */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+      {/* 모든 화면에서 가로 레이아웃으로 통일 */}
+      <div className="flex flex-row gap-3 sm:gap-4">
         {/* 회사 로고 */}
         {imageUrl && (
-          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto sm:mx-0 flex-shrink-0">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
             <img
               src={imageUrl}
               alt={`${company} 로고`}
