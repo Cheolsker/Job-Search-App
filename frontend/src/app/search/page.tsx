@@ -7,6 +7,7 @@ import JobCard from "@/components/JobCard";
 import SkeletonLoader from "@/components/SkeletonLoader";
 import FilterPanel from "@/components/FilterPanel";
 import EmptyState from "@/components/EmptyState";
+import ScrollToTop from "@/components/ScrollToTop";
 
 interface Job {
   id: string;
@@ -583,6 +584,9 @@ function SearchPageContent() {
           )}
         </div>
       </div>
+
+      {/* 맨 위로 스크롤 버튼 */}
+      <ScrollToTop />
     </main>
   );
 }
