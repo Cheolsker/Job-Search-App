@@ -1,0 +1,145 @@
+/* Mobile Filter Modal Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.5;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-once {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Mobile Modal Overlay */
+.modalOverlay {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Mobile Modal Content */
+.modalContent {
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Filter Content Animation */
+.filterContent {
+  animation: fadeInUp 0.4s ease-out 0.1s both;
+}
+
+/* Custom Scrollbar for Mobile */
+.customScrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.customScrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.customScrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.customScrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Touch-friendly button animations */
+.touchButton {
+  transition: all 0.2s ease-out;
+  transform-origin: center;
+}
+
+.touchButton:active {
+  transform: scale(0.95);
+}
+
+.touchButton:hover {
+  transform: scale(1.02);
+}
+
+/* Filter badge animation */
+.filterBadge {
+  animation: pulse-once 0.3s ease-out;
+}
+
+/* Gradient background for modal footer */
+.modalFooter {
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 1) 70%,
+    rgba(255, 255, 255, 0.8) 100%
+  );
+}
+
+/* Mobile-optimized spacing */
+@media (max-width: 768px) {
+  .mobileSpacing {
+    padding: 1rem;
+  }
+
+  .mobileTouchTarget {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+.smoothTransition {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus styles for accessibility */
+.focusRing:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Loading state animations */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
